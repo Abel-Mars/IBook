@@ -1,36 +1,64 @@
 package com.example.ibook;
 import java.util.ArrayList;
+import java.util.List;
 import android.Manifest;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.Toast;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
+import org.litepal.LitePal;
 public class MainActivity extends AppCompatActivity {
-    BookAdapter adapter;
+
+    List<FileBean> filess=new ArrayList<>();
+    RecyclerView rv;
+    NewsAdapter newsAdapter;
+
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater=getMenuInflater();
+        inflater.inflate(R.menu.menu,menu);
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.option_init:
+                Intent intents =new Intent(MainActivity.this,Init_Menu.class);
+                startActivity(intents);
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+    public void refresh(List<FileBean> filess){
+        rv=(RecyclerView)findViewById(R.id.rv);
+        rv.setLayoutManager(new StaggeredGridLayoutManager(3,StaggeredGridLayoutManager.VERTICAL));
+        newsAdapter = new NewsAdapter(filess);
+        rv.setAdapter(newsAdapter);
+        rv.setItemAnimator(new DefaultItemAnimator());
+    }
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         judge();
-        final ArrayList<FileBean> filess=getFilesByType(0);
-        for(FileBean file:filess){
-            Log.d("ABEL",file.toString());
-        }
-        ListView lv =(ListView)findViewById(R.id.lv);
-        adapter = new BookAdapter(MainActivity.this, R.layout.books, filess);
-        lv.setAdapter(adapter);
-        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        filess= LitePal.where("choose = ?and exst=? ","1","0").find(FileBean.class);
+        refresh(filess);
+        newsAdapter.setOnItemClickListener(new NewsAdapter.OnRecyclerItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemClick(View view, int position) {
                 FileBean files=filess.get(position);
                 String lujin=files.toString();
                 Bundle bundle =new Bundle();
@@ -39,7 +67,39 @@ public class MainActivity extends AppCompatActivity {
                 intent.putExtras(bundle);
                 //finish();
                 startActivity(intent);
-                //Toast.makeText(MainActivity.this,lujin,Toast.LENGTH_LONG).show();
+
+            }
+        });
+        newsAdapter.setOnItemLongClickListener(new NewsAdapter.onRecyclerItemLongClickListener() {
+            @Override
+            public void onItemLongClick(View view, final int position) {
+                Log.i("delete1",filess.get(position).toString());
+                AlertDialog.Builder builder =new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("删除警告");
+                builder.setMessage("确认删除，即将从书架删除！");
+                builder.setCancelable(false);
+                builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //Log.i("delete2",filess.get(position).toString());
+                        List<FileBean>l_files=LitePal.where("file_lujin=?",filess.get(position).toString()).find(FileBean.class);
+                        for(FileBean f:l_files){
+                           // Log.i("tagggg","delete");
+                            f.setChoose(0);
+                            f.save();
+                        }
+                        newsAdapter.removeItem(position);
+
+                        Toast.makeText(MainActivity.this,"删除成功",Toast.LENGTH_LONG).show();
+                    }
+                });
+                builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                });
+                builder.show();
+
             }
         });
     }
@@ -60,41 +120,12 @@ public class MainActivity extends AppCompatActivity {
                     //init();
                 }else{
                     Log.d("in","third");
-                    Toast.makeText(this,"已拒绝",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this,"已拒绝",Toast.LENGTH_SHORT).show();
                     finish();
                 }
                 break;
             default:
         }
-    }
-    public ArrayList<FileBean> getFilesByType(int fileType) {
-        ArrayList<FileBean> files = new ArrayList<FileBean>();
-        // 扫描files文件库
-        Cursor c = null;
-        try {
-            c = MainActivity.this.getContentResolver().query(MediaStore.Files.getContentUri("external"), new String[]{"_id", "_data", "_size"}, null, null, null);
-            int dataindex = c.getColumnIndex(MediaStore.Files.FileColumns.DATA);
-            int sizeindex = c.getColumnIndex(MediaStore.Files.FileColumns.SIZE);
-
-            while (c.moveToNext()) {
-                String path = c.getString(dataindex);
-                if (FileUtils.getFileType(path) == fileType) {
-                    if (!FileUtils.isExists(path)) {
-                        continue;
-                    }
-                    long size = c.getLong(sizeindex);
-                    FileBean fileBean = new FileBean(path);
-                    files.add(fileBean);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (c != null) {
-                c.close();
-            }
-        }
-        return files;
     }
 }
 

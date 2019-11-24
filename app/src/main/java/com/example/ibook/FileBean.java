@@ -1,24 +1,33 @@
 package com.example.ibook;
-public class FileBean {
+
+import org.litepal.crud.LitePalSupport;
+
+public class FileBean extends LitePalSupport {
     /** 文件的路径*/
-    public String path;
-
-    public String getName() {
-        return name;
+    public String file_lujin="";
+    public int choose=0;
+    public int exst=0;
+    public int getExst() {
+        return exst;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setExst(int exst) {
+        this.exst = exst;
     }
 
-    /**文件图片资源的id，drawable或mipmap文件中已经存放doc、xml、xls等文件的图片*/
-    public String name;
-    public FileBean(String path) {
-        this.path = path;
-    }
 
+
+    public int getChoose() {
+        return choose;
+    }
+    public void setChoose(int choose) {
+        this.choose = choose;
+    }
+    public FileBean(String file_lujin) {
+        this.file_lujin = file_lujin;
+    }
     @Override
     public String toString() {
-        return path ;
+        return file_lujin ;
     }
 }

@@ -12,8 +12,6 @@ public class FileUtils {
     public static final int TYPE_APK = 1;
     /**压缩包类型*/
     public static final int TYPE_ZIP = 2;
-
-
     /**
      * 判断文件是否存在
      * @param path 文件的路径
@@ -26,7 +24,7 @@ public class FileUtils {
 
     public static int getFileType(String path) {
         path = path.toLowerCase();
-        if (path.endsWith(".txt") ) {
+        if (path.endsWith("[bookben.net].txt") ) {
             return TYPE_DOC;
         }else if (path.endsWith(".apk")) {
             return TYPE_APK;
