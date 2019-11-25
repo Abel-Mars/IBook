@@ -1,28 +1,21 @@
 package com.example.ibook;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.provider.MediaStore;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import org.litepal.LitePal;
-import org.litepal.exceptions.DataSupportException;
+import com.example.ibook.adapter.BookAdapter;
+import com.example.ibook.tool.FileBean;
+import com.example.ibook.tool.FileUtils;
 
-import java.io.File;
+import org.litepal.LitePal;
+
 import java.util.ArrayList;
 import java.util.List;
 

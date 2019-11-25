@@ -6,6 +6,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+
+import com.example.ibook.adapter.ScanViewAdapter;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,7 +30,7 @@ public class Book extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         progressDialog =new ProgressDialog(Book.this);
         progressDialog.setMessage("Loading.....");
-        progressDialog.setCancelable(true);
+        progressDialog.setCancelable(false);
         progressDialog.show();
         setContentView(R.layout.activity_book2);
         Bundle bundle = getIntent().getExtras();

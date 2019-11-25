@@ -16,6 +16,8 @@ import android.view.VelocityTracker;
 import android.view.View;
 import android.widget.RelativeLayout;
 
+import com.example.ibook.adapter.PageAdapter;
+import com.example.ibook.adapter.ScanViewAdapter;
 import java.util.Timer;
 import java.util.TimerTask;
 public class ScanView extends RelativeLayout
@@ -373,7 +375,6 @@ public class ScanView extends RelativeLayout
         super.dispatchTouchEvent(event);
         return true;
     }
-
     /*
      * （非 Javadoc） 在这里绘制翻页阴影效果
      *

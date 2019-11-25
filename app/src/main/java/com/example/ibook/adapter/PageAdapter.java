@@ -1,4 +1,4 @@
-package com.example.ibook;
+package com.example.ibook.adapter;
 import android.view.View;
 
 public abstract class PageAdapter

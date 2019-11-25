@@ -3,6 +3,6 @@
     <dbname value="books_words" />
     <version value="2" />
     <list>
-        <mapping class="com.example.ibook.FileBean"></mapping>
+        <mapping class="com.example.ibook.tool.FileBean"></mapping>
     </list>
 </litepal>

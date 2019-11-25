@@ -2,7 +2,6 @@ package com.example.ibook;
 import java.util.ArrayList;
 import java.util.List;
 import android.Manifest;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -11,22 +10,23 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
-import androidx.appcompat.app.AlertDialog;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.StaggeredGridLayoutManager;
-import org.litepal.LitePal;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+import com.example.ibook.bookshell_frg;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
 public class MainActivity extends AppCompatActivity {
-
-    List<FileBean> filess=new ArrayList<>();
-    RecyclerView rv;
-    NewsAdapter newsAdapter;
-
+    private  BottomNavigationView b1;
+    private bookshell_frg find_frangment;
+    private bookstore_frg insert_frangment;
+    private bookmy_frg  new_frangment;
+    private Fragment[] fragments;
+    private int lastSelectedPosition;
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater=getMenuInflater();
@@ -43,65 +43,13 @@ public class MainActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-    public void refresh(List<FileBean> filess){
-        rv=(RecyclerView)findViewById(R.id.rv);
-        rv.setLayoutManager(new StaggeredGridLayoutManager(3,StaggeredGridLayoutManager.VERTICAL));
-        newsAdapter = new NewsAdapter(filess);
-        rv.setAdapter(newsAdapter);
-        rv.setItemAnimator(new DefaultItemAnimator());
-    }
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         judge();
-        filess= LitePal.where("choose = ?and exst=? ","1","0").find(FileBean.class);
-        refresh(filess);
-        newsAdapter.setOnItemClickListener(new NewsAdapter.OnRecyclerItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position) {
-                FileBean files=filess.get(position);
-                String lujin=files.toString();
-                Bundle bundle =new Bundle();
-                bundle.putString("lujin", lujin);
-                Intent intent = new Intent(MainActivity.this,Book.class);
-                intent.putExtras(bundle);
-                //finish();
-                startActivity(intent);
-
-            }
-        });
-        newsAdapter.setOnItemLongClickListener(new NewsAdapter.onRecyclerItemLongClickListener() {
-            @Override
-            public void onItemLongClick(View view, final int position) {
-                Log.i("delete1",filess.get(position).toString());
-                AlertDialog.Builder builder =new AlertDialog.Builder(MainActivity.this);
-                builder.setTitle("删除警告");
-                builder.setMessage("确认删除，即将从书架删除！");
-                builder.setCancelable(false);
-                builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        //Log.i("delete2",filess.get(position).toString());
-                        List<FileBean>l_files=LitePal.where("file_lujin=?",filess.get(position).toString()).find(FileBean.class);
-                        for(FileBean f:l_files){
-                           // Log.i("tagggg","delete");
-                            f.setChoose(0);
-                            f.save();
-                        }
-                        newsAdapter.removeItem(position);
-
-                        Toast.makeText(MainActivity.this,"删除成功",Toast.LENGTH_LONG).show();
-                    }
-                });
-                builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
-                });
-                builder.show();
-
-            }
-        });
+        b1= (BottomNavigationView)findViewById(R.id.navigation);
+        infrang();
     }
     public void judge(){
         if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED){
@@ -126,6 +74,58 @@ public class MainActivity extends AppCompatActivity {
                 break;
             default:
         }
+    }
+    public void infrang(){
+        //b1.setOnNavigationItemSelectedListener(this);
+        find_frangment = new bookshell_frg();
+        new_frangment = new bookmy_frg();
+        insert_frangment = new bookstore_frg();
+        fragments = new Fragment[]{find_frangment, insert_frangment,new_frangment};
+        lastSelectedPosition = 0;
+        //默认提交第一个
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.frangment_change, find_frangment)//添加
+                .show(find_frangment)//展示
+                .commit();//提交
+        b1.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                switch (menuItem.getItemId()){
+                    case R.id.find_all:
+                        if (0 != lastSelectedPosition) {
+                            setDefaultFragment(lastSelectedPosition, 0);
+                            lastSelectedPosition = 0;
+                        }
+                        return true;
+                    case R.id.insert_all:
+                        if (1 != lastSelectedPosition) {
+                            setDefaultFragment(lastSelectedPosition, 1);
+                            lastSelectedPosition = 1;
+                        }
+                        return true;
+                    case R.id.new_all:
+                        if (2 != lastSelectedPosition) {
+                            setDefaultFragment(lastSelectedPosition, 2);
+                            lastSelectedPosition = 2;
+                        }
+                        return true;
+                }
+                return false;
+            }
+        });
+    }
+    private void setDefaultFragment(int lastIndex,int index) {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.hide(fragments[lastIndex]);
+        if (!fragments[index].isAdded()) {
+            transaction.add(R.id.frangment_change, fragments[index]);
+        }
+        //需要展示fragment下标的位置
+        //commit：安排该事务的提交。这一承诺不会立即发生;它将被安排在主线程上，以便在线程准备好的时候完成。
+        //commitAllowingStateLoss：与 commit类似，但允许在活动状态保存后执行提交。这是危险的，因为如果Activity需要从其状态恢复，
+        // 那么提交就会丢失，因此，只有在用户可以意外地更改UI状态的情况下，才可以使用该提交
+        transaction.show(fragments[index]).commit();
     }
 }
 

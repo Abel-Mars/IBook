@@ -5,6 +5,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.ibook.tool.FileBean;
+
 import java.io.File;
 import java.util.List;
 public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
@@ -71,14 +74,14 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
             new_bt = itemView.findViewById(R.id.new_bt);
         }
     }
-    interface OnRecyclerItemClickListener {
+    public interface OnRecyclerItemClickListener {
         public void onItemClick(View view, int position);
     }
 
     /**
      * 长按事件
      */
-    interface  onRecyclerItemLongClickListener{
+    public interface  onRecyclerItemLongClickListener{
         public void onItemLongClick(View view, int position);
     }
 

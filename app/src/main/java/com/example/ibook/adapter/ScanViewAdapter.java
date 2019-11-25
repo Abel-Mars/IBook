@@ -1,10 +1,13 @@
-package com.example.ibook;
+package com.example.ibook.adapter;
 
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
+
+import com.example.ibook.R;
+import com.example.ibook.adapter.PageAdapter;
 
 import java.util.List;
 
@@ -14,6 +17,12 @@ public class ScanViewAdapter extends PageAdapter
     List<String> items;
     AssetManager am;
     List<String> pages;
+    public View getView()
+    {
+        View view = LayoutInflater.from(context).inflate(R.layout.page_layout,
+                null);
+        return view;
+    }
     public ScanViewAdapter(Context context, List<String> items,List<String> pages)
     {
         this.context = context;
@@ -21,7 +30,6 @@ public class ScanViewAdapter extends PageAdapter
         this.pages = pages;
         am = context.getAssets();
     }
-
     public void addContent(View view, int position)
     {
         TextView content = (TextView) view.findViewById(R.id.content);
@@ -31,16 +39,8 @@ public class ScanViewAdapter extends PageAdapter
         content.setText(pages.get(position-1));
         tv.setText(items.get(position - 1));
     }
-
     public int getCount()
     {
         return items.size();
-    }
-
-    public View getView()
-    {
-        View view = LayoutInflater.from(context).inflate(R.layout.page_layout,
-                null);
-        return view;
     }
 }
