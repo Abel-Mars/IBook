@@ -14,9 +14,11 @@
 
 6.[如何翻页：](https://blog.csdn.net/LIXIAONA_1101/article/details/86477512)
 
-7.分页思路：1.分段读取，都一部分在文件里显示一部分。
+7.分页思路：
 
-	   2.存入数据库
+1.分段读取，都一部分在文件里显示一部分。
+
+2.存入数据库
 	   
 阶段性任务：实现scrollview 的界面刷新。//未完成，但是没必要
 
@@ -62,7 +64,7 @@ Loading:https://blog.csdn.net/yujan_2015/article/details/77507446
 
 瀑布流：
 
-[长按删除，点击--11.20:](https://blog.csdn.net/qq_40869894/article/details/79627926)
+[长按删除，点击进入:](https://blog.csdn.net/qq_40869894/article/details/79627926)
 
 网页模块：
 
